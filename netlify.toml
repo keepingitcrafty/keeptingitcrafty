@@ -1,0 +1,13 @@
+# Keeping It Crafty — Netlify configuration
+# The customer page (index.html) and the colouring function live in the same site.
+
+[build]
+  functions = "netlify/functions"
+  publish = "."
+
+[functions]
+  # The AI call can take a few seconds; allow up to 30s.
+  node_bundler = "esbuild"
+
+[functions."colouring"]
+  timeout = 30
