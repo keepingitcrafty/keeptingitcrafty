@@ -1,0 +1,8 @@
+{
+  "name": "keeping-it-crafty",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@google/genai": "^3.0.0"
+  }
+}

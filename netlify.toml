@@ -6,8 +6,4 @@
   publish = "."
 
 [functions]
-  # The AI call can take a few seconds; allow up to 30s.
   node_bundler = "esbuild"
-
-[functions."colouring"]
-  timeout = 30
