@@ -71,8 +71,10 @@ exports.handler = async (event) => {
 
   // Prefer Netlify's built-in AI Gateway (what this site has always used); fall back to our own Gemini key.
   const GW_KEY = process.env.NETLIFY_AI_GATEWAY_KEY, GW_URL = (process.env.NETLIFY_AI_GATEWAY_URL || "").replace(/\/$/, "");
-  const KEY = GW_KEY || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
-  const BASE_URL = GW_KEY && GW_URL ? GW_URL : "https://generativelanguage.googleapis.com";
+  // Our own paid Google key (already saved in Netlify under this name) comes first.
+  const OWN = process.env.Gemini_API_Key_sketch_tool;
+  const KEY = OWN || GW_KEY || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+  const BASE_URL = !OWN && GW_KEY && GW_URL ? GW_URL : "https://generativelanguage.googleapis.com";
   if (!KEY) return json(500, { error: "The colouring service isn't finished being set up yet. (No API key.)" });
   const MODEL = process.env.GEMINI_MODEL || "gemini-3.1-flash-image";
 
@@ -86,7 +88,7 @@ exports.handler = async (event) => {
   if (b64.length > 11000000) return json(413, { error: "That photo is too large — please try a smaller one." });
 
   const payload = {
-        contents: [{ role: "user", parts: [{ text: BASE + (PROMPTS[body.style] || PROMPTS.colour) }, { inlineData: { mimeType: mime, data: b64 } }] }],
+    contents: [{ role: "user", parts: [{ text: BASE + (PROMPTS[body.style] || PROMPTS.colour) }, { inlineData: { mimeType: mime, data: b64 } }] }],
     generationConfig: { responseModalities: ["TEXT", "IMAGE"] },
   };
 
