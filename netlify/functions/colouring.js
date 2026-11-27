@@ -86,7 +86,7 @@ exports.handler = async (event) => {
   if (b64.length > 11000000) return json(413, { error: "That photo is too large — please try a smaller one." });
 
   const payload = {
-    contents: [{ parts: [{ text: BASE + (PROMPTS[body.style] || PROMPTS.colour) }, { inline_data: { mime_type: mime, data: b64 } }] }],
+        contents: [{ role: "user", parts: [{ text: BASE + (PROMPTS[body.style] || PROMPTS.colour) }, { inlineData: { mimeType: mime, data: b64 } }] }],
     generationConfig: { responseModalities: ["TEXT", "IMAGE"] },
   };
 
