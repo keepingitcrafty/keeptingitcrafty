@@ -69,9 +69,12 @@ exports.handler = async (event) => {
   if (event.httpMethod === "OPTIONS") return json(200, {});
   if (event.httpMethod !== "POST") return json(405, { error: "Method not allowed." });
 
-  const KEY = process.env.GEMINI_API_KEY;
+  // Prefer Netlify's built-in AI Gateway (what this site has always used); fall back to our own Gemini key.
+  const GW_KEY = process.env.NETLIFY_AI_GATEWAY_KEY, GW_URL = (process.env.NETLIFY_AI_GATEWAY_URL || "").replace(/\/$/, "");
+  const KEY = GW_KEY || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+  const BASE_URL = GW_KEY && GW_URL ? GW_URL : "https://generativelanguage.googleapis.com";
   if (!KEY) return json(500, { error: "The colouring service isn't finished being set up yet. (No API key.)" });
-  const MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash-image";
+  const MODEL = process.env.GEMINI_MODEL || "gemini-3.1-flash-image";
 
   let body;
   try { body = JSON.parse(event.body || "{}"); } catch { return json(400, { error: "Bad request." }); }
@@ -90,7 +93,7 @@ exports.handler = async (event) => {
   let resp, data;
   try {
     resp = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`,
+      `${BASE_URL}/v1beta/models/${MODEL}:generateContent`,
       { method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": KEY }, body: JSON.stringify(payload) }
     );
     data = await resp.json();
